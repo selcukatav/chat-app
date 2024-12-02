@@ -3,14 +3,14 @@ package middlewares
 import (
 	"errors"
 
-	"github.com/selcukatav/chat-app/models"
+	"github.com/selcukatav/chat-app/model"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 func Authentication(postgres *gorm.DB, username, password string) error {
 
-	var user models.User
+	var user model.User
 	result := postgres.Where("username=?", username).First(&user)
 	if errors.Is(result.Error,gorm.ErrRecordNotFound){
 		return errors.New("user not found")

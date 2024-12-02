@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/selcukatav/chat-app/api/middlewares"
-	"github.com/selcukatav/chat-app/models"
+	"github.com/selcukatav/chat-app/model"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +14,7 @@ type Handler struct {
 }
 
 func (h *Handler) Login(c echo.Context) error {
-	var user models.User
+	var user model.User
 	if err := c.Bind(&user); err != nil {
 		return echo.ErrBadRequest
 	}
