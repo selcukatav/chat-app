@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/selcukatav/chat-app/api/handler"
+	"github.com/selcukatav/chat-app/api/middlewares"
 	"github.com/selcukatav/chat-app/database"
 )
 
@@ -15,6 +16,8 @@ func New() *echo.Echo {
 	handler := &handler.Handler{
 		DB: db,
 	}
+	g := e.Group("/rooms")
+
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
@@ -22,6 +25,12 @@ func New() *echo.Echo {
 
 	e.POST("/login", handler.Login)
 	e.POST("/register", handler.Register)
+	ChatRooms(g)
 
 	return e
+}
+
+func ChatRooms(g *echo.Group) {
+	g.Use(middlewares.Authorize)
+	g.GET("/rooms", handler.Rooms)
 }

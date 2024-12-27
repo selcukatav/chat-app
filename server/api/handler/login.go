@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/selcukatav/chat-app/api/middlewares"
@@ -25,8 +26,23 @@ func (h *Handler) Login(c echo.Context) error {
 		})
 
 	}
-	return c.JSON(http.StatusOK,map[string]string{
-		"Message": "Login successfull!",
+	accessToken, err := middlewares.GenerateToken(&user)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+	refreshToken, err := middlewares.RefreshToken(&user)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+	c.Response().Header().Set("Authorization", "Bearer "+accessToken)
+
+	middlewares.SetCookie(c, "access_token", accessToken, time.Now().Add(time.Hour*24))
+	middlewares.SetCookie(c, "refresh_token", refreshToken, time.Now().Add(time.Hour*24))
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+		"Message":       "Login successfull!",
 	})
 
 }
