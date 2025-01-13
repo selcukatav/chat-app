@@ -5,6 +5,7 @@ import (
 	"github.com/selcukatav/chat-app/database"
 )
 
+
 func Run() {
 	e := route.New()
 	database.Postgres()

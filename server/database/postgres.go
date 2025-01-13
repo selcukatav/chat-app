@@ -34,6 +34,7 @@ func Postgres() *gorm.DB {
 		&model.ConversationParticipant{},
 		&model.Message{},
 		&model.Notification{},
+		&model.Friend{},
 		&model.Error{})
 	if err != nil {
 		log.Fatal("error occured while migrating")
