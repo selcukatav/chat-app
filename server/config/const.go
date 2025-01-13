@@ -18,5 +18,6 @@ const (
 const (
 	APIGetUserFriends = API + "/users/:id/friends"
 	APISearchFriends  = API + "/friends/:username/friends"
-	APIDeleteFriend   = API + "/friends/:friend_id"
+	APIDeleteFriend   = API + "/friends"
+	APIAddFriend   = API + "/friends"
 )

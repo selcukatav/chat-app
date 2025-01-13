@@ -50,6 +50,7 @@ func New() *echo.Echo {
 	e.GET(config.APIGetUserFriends, handler.GetFriends)
 	e.GET(config.APISearchFriends, handler.ListUsers)
 	e.DELETE(config.APIDeleteFriend, handler.DeleteUser)
+	e.POST(config.APIAddFriend,handler.AddFriend)
 
 	ChatRooms(g)
 

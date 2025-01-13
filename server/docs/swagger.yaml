@@ -36,6 +36,40 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/friends:
+    post:
+      consumes:
+      - application/json
+      description: Add friends with each other
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Friend ID
+        in: path
+        name: friend_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a friend
+      tags:
+      - Friends
   /api/friends/{friend_id}:
     delete:
       consumes:
