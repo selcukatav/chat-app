@@ -4,11 +4,11 @@ import "time"
 
 type Message struct {
 	ID             uint `gorm:"primaryKey;autoIncrement"`
-	SenderID       uint
+	SenderID       uint `json:"sender_id"`
 	Sender         *User
-	RecipientID    *uint
+	RecipientID    *uint `json:"recipient_id"`
 	Recipient      *User
-	ConversationID uint
+	ConversationID uint	`json:"conversation_id"`
 	Conversation   *Conversation
 	Content        string
 	Timestamp      time.Time `gorm:"autoCreateTime"`

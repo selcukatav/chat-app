@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/selcukatav/chat-app/api/handler"
-	"github.com/selcukatav/chat-app/api/middlewares"
 	"github.com/selcukatav/chat-app/config"
 	"github.com/selcukatav/chat-app/database"
 	_ "github.com/selcukatav/chat-app/docs"
@@ -26,38 +25,42 @@ func New() *echo.Echo {
 	handler := &handler.Handler{
 		DB: db,
 	}
-	g := e.Group("/rooms")
+	//g := e.Group("/rooms")
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
-
+	//Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	e.GET("/", func(c echo.Context) error {
-		return c.JSON(200, map[string]string{"message": "Welcome to Discord Clone API"})
-	})
+	//websocket conc start
+	go handler.HandleMessages()
+
+	e.GET(config.APIChatRooms, handler.ChatRooms)
+
 	//Auth
 	e.GET(config.APILogin, handler.Login)
 	e.POST(config.APIRegister, handler.Register)
-	//users
-	e.PUT(config.APIUpdateUser, handler.UpdateUser)
+
+	//Users
+	e.PATCH(config.APIUpdateUser, handler.UpdateUser)
 	e.GET(config.APIGetUser, handler.GetUser)
 	e.GET(config.APIListUsers, handler.ListUsers)
 	e.DELETE(config.APIDeleteUser, handler.DeleteUser)
-	//friends
+
+	//Friends
 	e.GET(config.APIGetUserFriends, handler.GetFriends)
 	e.GET(config.APISearchFriends, handler.ListUsers)
-	e.DELETE(config.APIDeleteFriend, handler.DeleteUser)
-	e.POST(config.APIAddFriend,handler.AddFriend)
+	e.DELETE(config.APIDeleteFriend, handler.DeleteFriend)
+	e.POST(config.APIAddFriend, handler.AddFriend)
 
-	ChatRooms(g)
+	//Conversation
+	e.POST(config.APICreateConversation, handler.CreateConversation)
+	e.GET(config.APIListConversation, handler.ListConversations)
+	e.POST(config.APIAddConversationParticipants, handler.AddConversationParticipant)
+	e.DELETE(config.APIDeleteConversationParticipants, handler.DeleteConversationParticipant)
+	e.GET(config.APIListConversationParticipants, handler.ListConversationsParticipants)
 
 	return e
-}
-
-func ChatRooms(g *echo.Group) {
-	g.Use(middlewares.Authorize)
-	g.GET("/rooms", handler.Rooms)
 }

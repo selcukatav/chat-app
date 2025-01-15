@@ -4,7 +4,7 @@ import "time"
 
 type Conversation struct {
 	ID        uint      `gorm:"primaryKey"`
-	Subject   *string   `gorm:"size:255"`
+	Subject   string   `gorm:"size:255" json:"subject"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 }
 

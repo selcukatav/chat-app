@@ -16,7 +16,7 @@ import (
 // @Param        user  body      model.User        true  "User data"
 // @Success      200   {object}  model.User
 // @Failure      400   {object}  map[string]string
-// @Router       /api/users/{id} [put]
+// @Router       /api/users/{id} [patch]
 func (h *Handler) UpdateUser(c echo.Context) error {
 	id := c.Param("id")
 	var user model.User

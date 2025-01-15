@@ -4,9 +4,9 @@ import "time"
 
 type ConversationParticipant struct {
 	ID             uint `gorm:"primaryKey"`
-	UserID         uint
+	UserID         uint `json:"user_id"`
 	User           *User
-	ConversationID uint
+	ConversationID uint `json:"conversation_id"`
 	Conversation   *Conversation
 	Role           string    `gorm:"default:'member';size:50"`
 	JoinedAt       time.Time `gorm:"autoCreateTime"`

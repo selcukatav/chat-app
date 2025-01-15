@@ -21,7 +21,7 @@ func Postgres() *gorm.DB {
 	db = db.Debug()
 	// db.Migrator().DropTable(&model.User{},
 	// 	&model.Conversation{},
-	// 	&model.Contact{},
+	// 	
 	// 	&model.ConversationParticipant{},
 	// 	&model.Message{},
 	// 	&model.Notification{},
@@ -30,7 +30,6 @@ func Postgres() *gorm.DB {
 	err = db.AutoMigrate(
 		&model.User{},
 		&model.Conversation{},
-		&model.Contact{},
 		&model.ConversationParticipant{},
 		&model.Message{},
 		&model.Notification{},
