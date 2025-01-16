@@ -62,7 +62,6 @@ func (h *Handler) FindFriends(c echo.Context) error {
 // @Success      200  {object}  map[string]string
 // @Failure      400  {object}  map[string]string
 // @Router       /api/friends [delete]
-
 func (h *Handler) DeleteFriend(c echo.Context) error {
 	
 	var friend model.Friend

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -34,15 +35,15 @@ func (h *Handler) CreateConversation(c echo.Context) error {
 	return c.JSON(http.StatusOK, subject)
 }
 
-// @Summary      List conversations by user ID
-// @Description  Retrieve all conversations associated with a specific user
+// @Summary      List conversations
+// @Description  Retrieve all conversations
 // @Tags         Conversations
 // @Accept       json
 // @Produce      json
 // @Param        user_id  path      string  true  "User ID"
 // @Success      200      {array}   model.Conversation
 // @Failure      400      {object}  map[string]string
-// @Router       /api/conversations/{user_id} [get]
+// @Router       /api/conversations [get]
 func (h *Handler) ListConversations(c echo.Context) error {
 	var conversations []model.Conversation
 
@@ -130,6 +131,15 @@ func (h *Handler) DeleteConversationParticipant(c echo.Context) error {
 	})
 }
 
+// @Summary      List conversation participants by conversation ID
+// @Description  Retrieve all users associated with a specific conversation
+// @Tags         Conversations
+// @Accept       json
+// @Produce      json
+// @Param        conversation_id  path      string  true  "Conversation ID"
+// @Success      200      {array}   model.Conversation
+// @Failure      400      {object}  map[string]string
+// @Router       /api/conversations/{conversation_id} [get]
 func (h *Handler) ListConversationsParticipants(c echo.Context) error {
 	var conservationID = c.Param("conversation_id")
 	var conversationsParticipants []model.ConversationParticipant
@@ -141,4 +151,49 @@ func (h *Handler) ListConversationsParticipants(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, conversationsParticipants)
+}
+
+// @Summary      List conversations by user ID
+// @Description  Retrieve all conversations associated with a specific user
+// @Tags         Conversations
+// @Accept       json
+// @Produce      json
+// @Param        user_id  path      string  true  "User ID"
+// @Success      200      {array}   model.Conversation
+// @Failure      400      {object}  map[string]string
+// @Router       /api/conversations/{user_id} [get]
+func (h *Handler) ListUserConversations(c echo.Context) error {
+	var userID = c.Param("user_id")
+	var conversations []model.ConversationParticipant
+
+	if err := h.DB.Where("user_id=?", userID).Find(&conversations).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"Message": "Error occurred while listing conversations",
+		})
+	}
+
+	return c.JSON(http.StatusOK, conversations)
+}
+
+func (h *Handler) ConversationRoom(c echo.Context) error {
+
+	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+
+	if err != nil {
+		fmt.Println("websocket connection is not established: ", err)
+		return err
+	}
+
+	conversationID:=c.QueryParam("conversation_id")
+	if conversationID==""{
+		return c.JSON(http.StatusBadRequest,map[string]string{
+			"Message":"conversation_id is required",
+		})
+	}
+	if err:=h.ChatAction(conn, conversationID); err!=nil{
+		fmt.Println("Chat action error: ",err)
+		return err
+	}
+	return nil
+
 }

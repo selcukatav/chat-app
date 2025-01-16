@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/selcukatav/chat-app/api/handler"
+	"github.com/selcukatav/chat-app/api/middlewares"
 	"github.com/selcukatav/chat-app/config"
 	"github.com/selcukatav/chat-app/database"
 	_ "github.com/selcukatav/chat-app/docs"
@@ -25,7 +26,6 @@ func New() *echo.Echo {
 	handler := &handler.Handler{
 		DB: db,
 	}
-	//g := e.Group("/rooms")
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000"},
@@ -34,33 +34,33 @@ func New() *echo.Echo {
 	//Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	//websocket conc start
-	go handler.HandleMessages()
-
-	e.GET(config.APIChatRooms, handler.ChatRooms)
-
 	//Auth
 	e.GET(config.APILogin, handler.Login)
 	e.POST(config.APIRegister, handler.Register)
 
+	g := e.Group("/api")
+	g.Use(middlewares.Authorize)
+
+	g.GET(config.APIConversationRoom, handler.ConversationRoom)
 	//Users
-	e.PATCH(config.APIUpdateUser, handler.UpdateUser)
-	e.GET(config.APIGetUser, handler.GetUser)
-	e.GET(config.APIListUsers, handler.ListUsers)
-	e.DELETE(config.APIDeleteUser, handler.DeleteUser)
+	g.PATCH(config.APIUpdateUser, handler.UpdateUser)
+	g.GET(config.APIGetUser, handler.GetUser)
+	g.GET(config.APIListUsers, handler.ListUsers)
+	g.DELETE(config.APIDeleteUser, handler.DeleteUser)
 
 	//Friends
-	e.GET(config.APIGetUserFriends, handler.GetFriends)
-	e.GET(config.APISearchFriends, handler.ListUsers)
-	e.DELETE(config.APIDeleteFriend, handler.DeleteFriend)
-	e.POST(config.APIAddFriend, handler.AddFriend)
+	g.GET(config.APIGetUserFriends, handler.GetFriends)
+	g.GET(config.APISearchFriends, handler.ListUsers)
+	g.DELETE(config.APIDeleteFriend, handler.DeleteFriend)
+	g.POST(config.APIAddFriend, handler.AddFriend)
 
 	//Conversation
-	e.POST(config.APICreateConversation, handler.CreateConversation)
-	e.GET(config.APIListConversation, handler.ListConversations)
-	e.POST(config.APIAddConversationParticipants, handler.AddConversationParticipant)
-	e.DELETE(config.APIDeleteConversationParticipants, handler.DeleteConversationParticipant)
-	e.GET(config.APIListConversationParticipants, handler.ListConversationsParticipants)
+	g.POST(config.APICreateConversation, handler.CreateConversation)
+	g.GET(config.APIListConversation, handler.ListConversations)
+	g.POST(config.APIAddConversationParticipants, handler.AddConversationParticipant)
+	g.DELETE(config.APIDeleteConversationParticipants, handler.DeleteConversationParticipant)
+	g.GET(config.APIListConversationParticipants, handler.ListConversationsParticipants)
+	g.GET(config.APIListUserConversations, handler.ListUserConversations)
 
 	return e
 }

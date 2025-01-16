@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 	"github.com/selcukatav/chat-app/api/middlewares"
 	"github.com/selcukatav/chat-app/model"
 	"golang.org/x/crypto/bcrypt"
@@ -12,7 +13,8 @@ import (
 )
 
 type Handler struct {
-	DB *gorm.DB
+	DB          *gorm.DB
+	RedisClient *redis.Client
 }
 
 // @Summary      User login

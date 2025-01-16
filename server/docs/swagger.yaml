@@ -1,4 +1,30 @@
 definitions:
+  model.Conversation:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      subject:
+        type: string
+    type: object
+  model.ConversationParticipant:
+    properties:
+      conversation:
+        $ref: '#/definitions/model.Conversation'
+      conversation_id:
+        type: integer
+      id:
+        type: integer
+      joinedAt:
+        type: string
+      role:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+      user_id:
+        type: integer
+    type: object
   model.Friend:
     properties:
       friend:
@@ -36,7 +62,231 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/conversations:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all conversations
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Conversation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List conversations
+      tags:
+      - Conversations
+    post:
+      consumes:
+      - application/json
+      description: Create a new conversation with the given details
+      parameters:
+      - description: Conversation details
+        in: body
+        name: conversation
+        required: true
+        schema:
+          $ref: '#/definitions/model.Conversation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new conversation
+      tags:
+      - Conversations
+  /api/conversations/{conversation_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users associated with a specific conversation
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: conversation_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Conversation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List conversation participants by conversation ID
+      tags:
+      - Conversations
+  /api/conversations/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all conversations associated with a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Conversation'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List conversations by user ID
+      tags:
+      - Conversations
+  /api/conversations/participants:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user from an existing conversation
+      parameters:
+      - description: Participant details
+        in: body
+        name: participant
+        required: true
+        schema:
+          $ref: '#/definitions/model.ConversationParticipant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove a participant from a conversation
+      tags:
+      - Conversations
+    post:
+      consumes:
+      - application/json
+      description: Add a user to an existing conversation
+      parameters:
+      - description: Participant details
+        in: body
+        name: participant
+        required: true
+        schema:
+          $ref: '#/definitions/model.ConversationParticipant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ConversationParticipant'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a participant to a conversation
+      tags:
+      - Conversations
   /api/friends:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a friend by their Friend ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Friend ID
+        in: path
+        name: friend_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a friend
+      tags:
+      - Friends
     post:
       consumes:
       - application/json
@@ -68,35 +318,6 @@ paths:
               type: string
             type: object
       summary: Add a friend
-      tags:
-      - Friends
-  /api/friends/{friend_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove a friend by their Friend ID
-      parameters:
-      - description: Friend ID
-        in: path
-        name: friend_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Delete a friend
       tags:
       - Friends
   /api/login:
@@ -251,7 +472,7 @@ paths:
       summary: Find a user
       tags:
       - Users
-    put:
+    patch:
       consumes:
       - application/json
       description: Update a user's information by their ID
