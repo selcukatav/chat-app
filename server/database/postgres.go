@@ -1,17 +1,35 @@
 package database
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/selcukatav/chat-app/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/joho/godotenv"
 )
 
 var DB *gorm.DB
 
 func Postgres() *gorm.DB {
-	dsn := "host=localhost user=postgres password=123qwe dbname=chat_app port=5432 sslmode=disable TimeZone=Europe/Berlin"
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Berlin",
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB"),
+		os.Getenv("POSTGRES_PORT"),
+	)
+
+	fmt.Println("DSN:", dsn)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -21,7 +39,7 @@ func Postgres() *gorm.DB {
 	db = db.Debug()
 	// db.Migrator().DropTable(&model.User{},
 	// 	&model.Conversation{},
-	// 	
+	//
 	// 	&model.ConversationParticipant{},
 	// 	&model.Message{},
 	// 	&model.Notification{},
